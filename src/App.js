@@ -8,6 +8,7 @@ import {
   Table,
   TableRow,
   TableCell,
+  WidthType,
 } from "docx";
 import { saveAs } from "file-saver";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -20,7 +21,7 @@ import SignatureModal from "./SignatureModal";
 import { invoiceData } from "./data";
 
 const calculateTotal = (items) =>
-  items.reduce((total, item) => total + (item.quantity * item.price), 0);
+  items.reduce((total, item) => total + item.quantity * item.price, 0);
 
 const App = () => {
   const contentRef = useRef();
@@ -84,15 +85,19 @@ const App = () => {
                   children: [
                     new TableCell({
                       children: [new Paragraph({ text: "Description" })],
+                      width: { size: 50, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [new Paragraph({ text: "Quantity" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [new Paragraph({ text: "Price" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [new Paragraph({ text: "Total" })],
+                      width: { size: 20, type: WidthType.PERCENTAGE },
                     }),
                   ],
                 }),
@@ -102,16 +107,19 @@ const App = () => {
                       children: [
                         new TableCell({
                           children: [new Paragraph({ text: item.description })],
+                          width: { size: 50, type: WidthType.PERCENTAGE },
                         }),
                         new TableCell({
                           children: [
                             new Paragraph({ text: item.quantity.toString() }),
                           ],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
                         }),
                         new TableCell({
                           children: [
                             new Paragraph({ text: item.price.toString() }),
                           ],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
                         }),
                         new TableCell({
                           children: [
@@ -119,16 +127,24 @@ const App = () => {
                               text: (item.quantity * item.price).toString(),
                             }),
                           ],
+                          width: { size: 20, type: WidthType.PERCENTAGE },
                         }),
                       ],
                     })
                 ),
                 new TableRow({
                   children: [
-                    new TableCell({ children: [new Paragraph({ text: "" })] }),
-                    new TableCell({ children: [new Paragraph({ text: "" })] }),
+                    new TableCell({
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 50, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
                     new TableCell({
                       children: [new Paragraph({ text: "Total" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [
@@ -136,6 +152,7 @@ const App = () => {
                           text: calculateTotal(invoiceData.items).toString(),
                         }),
                       ],
+                      width: { size: 20, type: WidthType.PERCENTAGE },
                     }),
                   ],
                 }),
@@ -179,33 +196,36 @@ const App = () => {
     return blob;
   };
 
-  const handlePreview = (type) => {
+  const handlePreview = async (type) => {
     let blob;
     switch (type) {
       case "pdf":
         blob = generatePDF();
+        setPreviewContent(URL.createObjectURL(blob));
+        setPreviewType(type);
         break;
       case "word":
-        blob = generateWord();
+        blob = await generateWord();
+        saveAs(blob, `invoice.${type}`);
         break;
       case "rtf":
         blob = generateRTF();
+        saveAs(blob, `invoice.${type}`);
         break;
       default:
         return;
     }
-    setPreviewContent(URL.createObjectURL(blob));
-    setPreviewType(type);
   };
+  
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     let blob;
     switch (previewType) {
       case "pdf":
         blob = generatePDF();
         break;
       case "word":
-        blob = generateWord();
+        blob = await generateWord();
         break;
       case "rtf":
         blob = generateRTF();
@@ -242,6 +262,7 @@ const App = () => {
       );
       blob = doc.output("blob");
     }
+
     saveAs(blob, `invoice.${previewType}`);
     setPreviewContent(null);
   };
@@ -268,3 +289,4 @@ const App = () => {
 };
 
 export default App;
+

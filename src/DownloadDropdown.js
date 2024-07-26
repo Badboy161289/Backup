@@ -10,10 +10,10 @@ const DownloadDropdown = ({ handlePreview }) => (
         Preview as PDF
       </Dropdown.Item>
       <Dropdown.Item onClick={() => handlePreview("word")}>
-        Preview as Word
+        Download as Word
       </Dropdown.Item>
       <Dropdown.Item onClick={() => handlePreview("rtf")}>
-        Preview as RTF
+        Download as RTF
       </Dropdown.Item>
     </Dropdown.Menu>
   </Dropdown>
