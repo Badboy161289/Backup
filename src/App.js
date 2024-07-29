@@ -12,6 +12,7 @@ import {
 } from "docx";
 import { saveAs } from "file-saver";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Button } from "react-bootstrap"; // Add this line
 
 import InvoicePreview from "./InvoicePreview";
 import DownloadDropdown from "./DownloadDropdown";
@@ -20,12 +21,12 @@ import SignatureModal from "./SignatureModal";
 
 import { invoiceData } from "./data";
 
+
 const calculateTotal = (items, discount) => {
   const subtotal = items.reduce((total, item) => total + item.quantity * item.price, 0);
   const discountAmount = (subtotal * discount) / 100;
   return subtotal - discountAmount;
 };
-
 
 const App = () => {
   const contentRef = useRef();
@@ -44,11 +45,10 @@ const App = () => {
       alert("Please enter your name to sign the document.");
       return;
     }
-    handleDownload();
     handleClose();
   };
 
-  const generatePDF = () => {
+  const generatePDF = (withSignature) => {
     const doc = new jsPDF();
 
     const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
@@ -72,15 +72,18 @@ const App = () => {
     doc.text(`Subtotal: ${subtotal}`, 10, doc.autoTable.previous.finalY + 10);
     doc.text(`Discount: ${invoiceData.discount}%`, 10, doc.autoTable.previous.finalY + 20);
     doc.text(`Total: ${total}`, 10, doc.autoTable.previous.finalY + 30);
+    if (withSignature && signatureName) {
+      doc.text(`Signed by: ${signatureName}`, 10, doc.autoTable.previous.finalY + 40);
+    }
 
     return doc.output("blob");
   };
 
-  const generateWord = async () => {
+  const generateWord = async (withSignature) => {
     const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
     const discountAmount = (subtotal * invoiceData.discount) / 100;
     const total = subtotal - discountAmount;
-  
+
     const doc = new DocxDocument({
       sections: [
         {
@@ -215,22 +218,48 @@ const App = () => {
                     }),
                   ],
                 }),
+                withSignature && signatureName
+                  ? new TableRow({
+                      children: [
+                        new TableCell({
+                          children: [new Paragraph({ text: "" })],
+                          width: { size: 50, type: WidthType.PERCENTAGE },
+                        }),
+                        new TableCell({
+                          children: [new Paragraph({ text: "" })],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
+                        }),
+                        new TableCell({
+                          children: [new Paragraph({ text: "Signed by" })],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph({
+                              text: signatureName,
+                            }),
+                          ],
+                          width: { size: 20, type: WidthType.PERCENTAGE },
+                        }),
+                      ],
+                    })
+                  : null,
               ],
             }),
           ],
         },
       ],
     });
-  
+
     const blob = await Packer.toBlob(doc);
     return blob;
   };
 
-  const generateRTF = () => {
+  const generateRTF = (withSignature) => {
     const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
     const discountAmount = (subtotal * invoiceData.discount) / 100;
     const total = subtotal - discountAmount;
-  
+
     const rtfContent = `
       {\\rtf1\\ansi\\deff0
       {\\fonttbl{\\f0 Times New Roman;}}
@@ -238,106 +267,89 @@ const App = () => {
       \\f0\\fs24\\b Invoice\\b0\\line
       Date: ${invoiceData.date}\\line
       Company: ${invoiceData.company}\\line
-      Address: ${invoiceData.address}\\line\\line
-      \\trowd\\trgaph108\\trleft-108
-      \\cellx2520\\cellx3780\\cellx5040\\cellx6300
-      \\intbl\\b Description\\b0\\cell\\b Quantity\\b0\\cell\\b Price\\b0\\cell\\b Total\\b0\\cell\\row
+      Address: ${invoiceData.address}\\line
+      \\line
+      \\b Description\\b0\\tab\\b Quantity\\b0\\tab\\b Price\\b0\\tab\\b Total\\b0\\line
       ${invoiceData.items
         .map(
-          (item) => `
-        \\intbl ${item.description}\\cell ${item.quantity}\\cell ${
-            item.price
-          }\\cell ${item.quantity * item.price}\\cell\\row
-      `
+          (item) =>
+            `${item.description}\\tab ${item.quantity}\\tab ${item.price}\\tab ${
+              item.quantity * item.price
+            }\\line`
         )
         .join("")}
-      \\intbl\\cell\\cell\\b Subtotal\\b0\\cell ${subtotal}\\cell\\row
-      \\intbl\\cell\\cell\\b Discount\\b0\\cell ${invoiceData.discount}%\\cell\\row
-      \\intbl\\cell\\cell\\b Total\\b0\\cell ${total}\\cell\\row
+      \\line
+      Subtotal: ${subtotal}\\line
+      Discount: ${invoiceData.discount}%\\line
+      Total: ${total}\\line
+      ${withSignature && signatureName ? `Signed by: ${signatureName}\\line` : ""}
       }
     `;
-    const blob = new Blob([rtfContent], { type: "application/rtf" });
-    return blob;
+    return new Blob([rtfContent], { type: "application/rtf" });
   };
 
   const handlePreview = async (type) => {
-  let blob;
-  switch (type) {
-    case "pdf":
-      blob = generatePDF();
-      setPreviewContent(URL.createObjectURL(blob));
-      setPreviewType(type);
-      break;
-    case "word":
-      blob = await generateWord();
-      saveAs(blob, `invoice.${type}`);
-      break;
-    case "rtf":
-      blob = generateRTF();
-      saveAs(blob, `invoice.${type}`);
-      break;
-    default:
+    if (!signatureName) {
+      alert("Please add a signature before previewing the invoice.");
+      handleShow();
       return;
-  }
-};
-  
+    }
 
-const handleDownload = async () => {
-  let blob;
-  switch (previewType) {
-    case "pdf":
-      blob = generatePDF();
-      break;
-    case "word":
-      blob = await generateWord();
-      break;
-    case "rtf":
-      blob = generateRTF();
-      break;
-    default:
-      return;
-  }
+    setPreviewType(type);
+    let blob;
 
-  if (signatureName && previewType === "pdf") {
-    const doc = new jsPDF();
-    const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
-    const discountAmount = (subtotal * invoiceData.discount) / 100;
-    const total = subtotal - discountAmount;
+    switch (type) {
+      case "pdf":
+        blob = generatePDF(true);
+        setPreviewContent(URL.createObjectURL(blob));
+        break;
+      case "word":
+        blob = await generateWord(true);
+        setPreviewContent(URL.createObjectURL(blob));
+        break;
+      case "rtf":
+        blob = generateRTF(true);
+        setPreviewContent(URL.createObjectURL(blob));
+        break;
+      default:
+        return;
+    }
+  };
 
-    doc.text("Invoice", 10, 10);
-    doc.text(`Date: ${invoiceData.date}`, 10, 20);
-    doc.text(`Company: ${invoiceData.company}`, 10, 30);
-    doc.text(`Address: ${invoiceData.address}`, 10, 40);
-    doc.autoTable({
-      startY: 50,
-      head: [["Description", "Quantity", "Price", "Total"]],
-      body: invoiceData.items.map((item) => [
-        item.description,
-        item.quantity,
-        item.price,
-        item.quantity * item.price,
-      ]),
-    });
-    doc.text(`Subtotal: ${subtotal}`, 10, doc.autoTable.previous.finalY + 10);
-    doc.text(`Discount: ${invoiceData.discount}%`, 10, doc.autoTable.previous.finalY + 20);
-    doc.text(`Total: ${total}`, 10, doc.autoTable.previous.finalY + 30);
-    doc.text(`Signed by: ${signatureName}`, 10, doc.autoTable.previous.finalY + 40);
+  const handleDownload = () => {
+    let blob;
+    switch (previewType) {
+      case "pdf":
+        blob = generatePDF(true);
+        saveAs(blob, "invoice.pdf");
+        break;
+      case "word":
+        generateWord(true).then((blob) => saveAs(blob, "invoice.docx"));
+        break;
+      case "rtf":
+        blob = generateRTF(true);
+        saveAs(blob, "invoice.rtf");
+        break;
+      default:
+        return;
+    }
+  };
 
-    blob = doc.output("blob");
-  }
-
-  saveAs(blob, `invoice.${previewType}`);
-  setPreviewContent(null);
-};
   return (
     <div className="container mt-5">
       <InvoicePreview invoiceData={invoiceData} calculateTotal={calculateTotal} />
+      <div className="text-center my-3">
+        <Button variant="primary" onClick={handleShow}>
+          Add Signature
+        </Button>
+      </div>
       <DownloadDropdown handlePreview={handlePreview} />
       <PreviewModal
         previewType={previewType}
         previewContent={previewContent}
         handleDownload={handleDownload}
         handleClose={() => setPreviewContent(null)}
+        handleShowSignature={handleShow}
       />
       <SignatureModal
         showModal={showModal}
@@ -351,4 +363,3 @@ const handleDownload = async () => {
 };
 
 export default App;
-
