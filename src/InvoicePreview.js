@@ -6,6 +6,10 @@ const InvoicePreview = ({ invoiceData, calculateTotal }) => {
     return <div>No invoice data available</div>;
   }
 
+  const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
+  const discountAmount = (subtotal * invoiceData.discount) / 100;
+  const total = calculateTotal(invoiceData.items, invoiceData.discount);
+
   return (
     <div className="invoice-preview">
       <h1>Invoice Preview</h1>
@@ -31,8 +35,16 @@ const InvoicePreview = ({ invoiceData, calculateTotal }) => {
             </tr>
           ))}
           <tr>
-            <td colSpan="3">Total</td>
-            <td>{calculateTotal(invoiceData.items)}</td>
+            <td colSpan="3">Sub-Total</td>
+            <td>{subtotal}</td>
+          </tr>
+          <tr>
+            <td colSpan="3">Discount ({invoiceData.discount}%)</td>
+            <td>{discountAmount}</td>
+          </tr>
+          <tr>
+            <td colSpan="3"><strong>Total</strong></td>
+            <td><strong>{total}</strong></td>
           </tr>
         </tbody>
       </table>
@@ -52,6 +64,7 @@ InvoicePreview.propTypes = {
         price: PropTypes.number,
       })
     ),
+    discount: PropTypes.number,
   }).isRequired,
   calculateTotal: PropTypes.func.isRequired,
 };
