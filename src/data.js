@@ -9,6 +9,8 @@ export const invoiceData = {
       { description: "Item 4", quantity: 50, price: 50 },
       { description: "Item 5", quantity: 10, price: 50 },
       { description: "Item 6", quantity: 10, price: 50 },
+      { description: "Item 7", quantity: 10, price: 50 },
     ],
+    discount: 20,
   };
   

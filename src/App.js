@@ -8,9 +8,11 @@ import {
   Table,
   TableRow,
   TableCell,
+  WidthType,
 } from "docx";
 import { saveAs } from "file-saver";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Button } from "react-bootstrap"; // Add this line
 
 import InvoicePreview from "./InvoicePreview";
 import DownloadDropdown from "./DownloadDropdown";
@@ -19,8 +21,12 @@ import SignatureModal from "./SignatureModal";
 
 import { invoiceData } from "./data";
 
-const calculateTotal = (items) =>
-  items.reduce((total, item) => total + (item.quantity * item.price), 0);
+
+const calculateTotal = (items, discount) => {
+  const subtotal = items.reduce((total, item) => total + item.quantity * item.price, 0);
+  const discountAmount = (subtotal * discount) / 100;
+  return subtotal - discountAmount;
+};
 
 const App = () => {
   const contentRef = useRef();
@@ -39,12 +45,16 @@ const App = () => {
       alert("Please enter your name to sign the document.");
       return;
     }
-    handleDownload();
     handleClose();
   };
 
-  const generatePDF = () => {
+  const generatePDF = (withSignature) => {
     const doc = new jsPDF();
+
+    const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
+    const discountAmount = (subtotal * invoiceData.discount) / 100;
+    const total = subtotal - discountAmount;
+
     doc.text("Invoice", 10, 10);
     doc.text(`Date: ${invoiceData.date}`, 10, 20);
     doc.text(`Company: ${invoiceData.company}`, 10, 30);
@@ -59,16 +69,21 @@ const App = () => {
         item.quantity * item.price,
       ]),
     });
-    doc.text(
-      `Total: ${calculateTotal(invoiceData.items)}`,
-      10,
-      doc.autoTable.previous.finalY + 10
-    );
+    doc.text(`Subtotal: ${subtotal}`, 10, doc.autoTable.previous.finalY + 10);
+    doc.text(`Discount: ${invoiceData.discount}%`, 10, doc.autoTable.previous.finalY + 20);
+    doc.text(`Total: ${total}`, 10, doc.autoTable.previous.finalY + 30);
+    if (withSignature && signatureName) {
+      doc.text(`Signed by: ${signatureName}`, 10, doc.autoTable.previous.finalY + 40);
+    }
 
     return doc.output("blob");
   };
 
-  const generateWord = async () => {
+  const generateWord = async (withSignature) => {
+    const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
+    const discountAmount = (subtotal * invoiceData.discount) / 100;
+    const total = subtotal - discountAmount;
+
     const doc = new DocxDocument({
       sections: [
         {
@@ -84,15 +99,19 @@ const App = () => {
                   children: [
                     new TableCell({
                       children: [new Paragraph({ text: "Description" })],
+                      width: { size: 50, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [new Paragraph({ text: "Quantity" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [new Paragraph({ text: "Price" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [new Paragraph({ text: "Total" })],
+                      width: { size: 20, type: WidthType.PERCENTAGE },
                     }),
                   ],
                 }),
@@ -102,16 +121,19 @@ const App = () => {
                       children: [
                         new TableCell({
                           children: [new Paragraph({ text: item.description })],
+                          width: { size: 50, type: WidthType.PERCENTAGE },
                         }),
                         new TableCell({
                           children: [
                             new Paragraph({ text: item.quantity.toString() }),
                           ],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
                         }),
                         new TableCell({
                           children: [
                             new Paragraph({ text: item.price.toString() }),
                           ],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
                         }),
                         new TableCell({
                           children: [
@@ -119,37 +141,125 @@ const App = () => {
                               text: (item.quantity * item.price).toString(),
                             }),
                           ],
+                          width: { size: 20, type: WidthType.PERCENTAGE },
                         }),
                       ],
                     })
                 ),
                 new TableRow({
                   children: [
-                    new TableCell({ children: [new Paragraph({ text: "" })] }),
-                    new TableCell({ children: [new Paragraph({ text: "" })] }),
                     new TableCell({
-                      children: [new Paragraph({ text: "Total" })],
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 50, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ text: "Subtotal" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({
                       children: [
                         new Paragraph({
-                          text: calculateTotal(invoiceData.items).toString(),
+                          text: subtotal.toString(),
                         }),
                       ],
+                      width: { size: 20, type: WidthType.PERCENTAGE },
                     }),
                   ],
                 }),
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 50, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ text: `Discount` })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          text: `${invoiceData.discount}%`,
+                        }),
+                      ],
+                      width: { size: 20, type: WidthType.PERCENTAGE },
+                    }),
+                  ],
+                }),
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 50, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ text: "" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ text: "Total" })],
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({
+                      children: [
+                        new Paragraph({
+                          text: total.toString(),
+                        }),
+                      ],
+                      width: { size: 20, type: WidthType.PERCENTAGE },
+                    }),
+                  ],
+                }),
+                withSignature && signatureName
+                  ? new TableRow({
+                      children: [
+                        new TableCell({
+                          children: [new Paragraph({ text: "" })],
+                          width: { size: 50, type: WidthType.PERCENTAGE },
+                        }),
+                        new TableCell({
+                          children: [new Paragraph({ text: "" })],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
+                        }),
+                        new TableCell({
+                          children: [new Paragraph({ text: "Signed by" })],
+                          width: { size: 15, type: WidthType.PERCENTAGE },
+                        }),
+                        new TableCell({
+                          children: [
+                            new Paragraph({
+                              text: signatureName,
+                            }),
+                          ],
+                          width: { size: 20, type: WidthType.PERCENTAGE },
+                        }),
+                      ],
+                    })
+                  : null,
               ],
             }),
           ],
         },
       ],
     });
+
     const blob = await Packer.toBlob(doc);
     return blob;
   };
 
-  const generateRTF = () => {
+  const generateRTF = (withSignature) => {
+    const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
+    const discountAmount = (subtotal * invoiceData.discount) / 100;
+    const total = subtotal - discountAmount;
+
     const rtfContent = `
       {\\rtf1\\ansi\\deff0
       {\\fonttbl{\\f0 Times New Roman;}}
@@ -157,104 +267,89 @@ const App = () => {
       \\f0\\fs24\\b Invoice\\b0\\line
       Date: ${invoiceData.date}\\line
       Company: ${invoiceData.company}\\line
-      Address: ${invoiceData.address}\\line\\line
-      \\trowd\\trgaph108\\trleft-108
-      \\cellx2520\\cellx3780\\cellx5040\\cellx6300
-      \\intbl\\b Description\\b0\\cell\\b Quantity\\b0\\cell\\b Price\\b0\\cell\\b Total\\b0\\cell\\row
+      Address: ${invoiceData.address}\\line
+      \\line
+      \\b Description\\b0\\tab\\b Quantity\\b0\\tab\\b Price\\b0\\tab\\b Total\\b0\\line
       ${invoiceData.items
         .map(
-          (item) => `
-        \\intbl ${item.description}\\cell ${item.quantity}\\cell ${
-            item.price
-          }\\cell ${item.quantity * item.price}\\cell\\row
-      `
+          (item) =>
+            `${item.description}\\tab ${item.quantity}\\tab ${item.price}\\tab ${
+              item.quantity * item.price
+            }\\line`
         )
         .join("")}
-      \\intbl\\cell\\cell\\b Total\\b0\\cell ${calculateTotal(
-        invoiceData.items
-      )}\\cell\\row
+      \\line
+      Subtotal: ${subtotal}\\line
+      Discount: ${invoiceData.discount}%\\line
+      Total: ${total}\\line
+      ${withSignature && signatureName ? `Signed by: ${signatureName}\\line` : ""}
       }
     `;
-    const blob = new Blob([rtfContent], { type: "application/rtf" });
-    return blob;
+    return new Blob([rtfContent], { type: "application/rtf" });
   };
 
-  const handlePreview = (type) => {
+  const handlePreview = async (type) => {
+    if (!signatureName) {
+      alert("Please add a signature before previewing the invoice.");
+      handleShow();
+      return;
+    }
+
+    setPreviewType(type);
     let blob;
+
     switch (type) {
       case "pdf":
-        blob = generatePDF();
+        blob = generatePDF(true);
+        setPreviewContent(URL.createObjectURL(blob));
         break;
       case "word":
-        blob = generateWord();
+        blob = await generateWord(true);
+        setPreviewContent(URL.createObjectURL(blob));
         break;
       case "rtf":
-        blob = generateRTF();
+        blob = generateRTF(true);
+        setPreviewContent(URL.createObjectURL(blob));
         break;
       default:
         return;
     }
-    setPreviewContent(URL.createObjectURL(blob));
-    setPreviewType(type);
   };
 
   const handleDownload = () => {
     let blob;
     switch (previewType) {
       case "pdf":
-        blob = generatePDF();
+        blob = generatePDF(true);
+        saveAs(blob, "invoice.pdf");
         break;
       case "word":
-        blob = generateWord();
+        generateWord(true).then((blob) => saveAs(blob, "invoice.docx"));
         break;
       case "rtf":
-        blob = generateRTF();
+        blob = generateRTF(true);
+        saveAs(blob, "invoice.rtf");
         break;
       default:
         return;
     }
-
-    if (signatureName && previewType === "pdf") {
-      const doc = new jsPDF();
-      doc.text("Invoice", 10, 10);
-      doc.text(`Date: ${invoiceData.date}`, 10, 20);
-      doc.text(`Company: ${invoiceData.company}`, 10, 30);
-      doc.text(`Address: ${invoiceData.address}`, 10, 40);
-      doc.autoTable({
-        startY: 50,
-        head: [["Description", "Quantity", "Price", "Total"]],
-        body: invoiceData.items.map((item) => [
-          item.description,
-          item.quantity,
-          item.price,
-          item.quantity * item.price,
-        ]),
-      });
-      doc.text(
-        `Total: ${calculateTotal(invoiceData.items)}`,
-        10,
-        doc.autoTable.previous.finalY + 10
-      );
-      doc.text(
-        `Signed by: ${signatureName}`,
-        10,
-        doc.autoTable.previous.finalY + 20
-      );
-      blob = doc.output("blob");
-    }
-    saveAs(blob, `invoice.${previewType}`);
-    setPreviewContent(null);
   };
 
   return (
     <div className="container mt-5">
       <InvoicePreview invoiceData={invoiceData} calculateTotal={calculateTotal} />
+      <div className="text-center my-3">
+        <Button variant="primary" onClick={handleShow}>
+          Add Signature
+        </Button>
+      </div>
       <DownloadDropdown handlePreview={handlePreview} />
       <PreviewModal
         previewType={previewType}
         previewContent={previewContent}
         handleDownload={handleDownload}
         handleClose={() => setPreviewContent(null)}
+        handleShowSignature={handleShow}
       />
       <SignatureModal
         showModal={showModal}
