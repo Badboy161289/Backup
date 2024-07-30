@@ -1,7 +1,8 @@
 import React from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import Signature from "./Signature";
 
-const SignatureModal = ({ showModal, handleClose, signatureName, handleSignatureNameChange, addSignature }) => (
+const SignatureModal = ({ showModal, handleClose, signatureName, handleSignatureNameChange, addSignature, setSignatureImage }) => (
   <Modal show={showModal} onHide={handleClose}>
     <Modal.Header closeButton>
       <Modal.Title>Add Signature</Modal.Title>
@@ -18,6 +19,7 @@ const SignatureModal = ({ showModal, handleClose, signatureName, handleSignature
           />
         </Form.Group>
       </Form>
+      <Signature setSignatureImage={setSignatureImage} />
     </Modal.Body>
     <Modal.Footer>
       <Button variant="secondary" onClick={handleClose}>

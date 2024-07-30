@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-export const generatePDF = (invoiceData, signatureName, withSignature) => {
+export const generatePDF = (invoiceData, signatureName, signatureImage, withSignature) => {
   const doc = new jsPDF();
 
   const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
@@ -22,11 +22,17 @@ export const generatePDF = (invoiceData, signatureName, withSignature) => {
       item.quantity * item.price,
     ]),
   });
+
   doc.text(`Subtotal: ${subtotal}`, 10, doc.autoTable.previous.finalY + 10);
   doc.text(`Discount: ${invoiceData.discount}%`, 10, doc.autoTable.previous.finalY + 20);
   doc.text(`Total: ${total}`, 10, doc.autoTable.previous.finalY + 30);
+
   if (withSignature && signatureName) {
     doc.text(`Signed by: ${signatureName}`, 10, doc.autoTable.previous.finalY + 40);
+
+    if (signatureImage) {
+      doc.addImage(signatureImage, 'PNG', 10, doc.autoTable.previous.finalY + 50, 40, 20); // Adjust dimensions and position as needed
+    }
   }
 
   return doc.output("blob");

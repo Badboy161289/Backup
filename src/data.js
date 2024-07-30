@@ -11,6 +11,6 @@ export const invoiceData = {
       { description: "Item 6", quantity: 10, price: 50 },
       { description: "Item 7", quantity: 10, price: 50 },
     ],
-    discount: 20,
+    discount: 30,
   };
   
