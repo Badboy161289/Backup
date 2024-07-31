@@ -7,7 +7,7 @@ const DownloadDropdown = ({ handlePreview }) => (
     <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" />
     <Dropdown.Menu>
       <Dropdown.Item onClick={() => handlePreview("pdf")}>
-        Preview as PDF
+        Download as PDF
       </Dropdown.Item>
       <Dropdown.Item onClick={() => handlePreview("word")}>
         Download as Word

@@ -48,7 +48,7 @@ export default function MainCompo() {
 
     switch (type) {
       case "pdf":
-        blob = generatePDF(invoiceData, signatureName, signatureImage, true);
+        blob = await generatePDF(invoiceData, signatureName, signatureImage, true);
         setPreviewContent(URL.createObjectURL(blob));
         break;
       case "word":
@@ -56,7 +56,7 @@ export default function MainCompo() {
         setPreviewContent(URL.createObjectURL(blob));
         break;
       case "rtf":
-        blob = generateRTF(invoiceData, signatureName, signatureImage, true);
+        blob = await generateRTF(invoiceData, signatureName, signatureImage, true);
         setPreviewContent(URL.createObjectURL(blob));
         break;
       default:
@@ -64,18 +64,19 @@ export default function MainCompo() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     let blob;
     switch (previewType) {
       case "pdf":
-        blob = generatePDF(invoiceData, signatureName, signatureImage, false);
+        blob = await generatePDF(invoiceData, signatureName, signatureImage, true);
         saveAs(blob, "invoice.pdf");
         break;
       case "word":
-        generateWord(invoiceData, signatureName, signatureImage, false).then((blob) => saveAs(blob, "invoice.docx"));
+        blob = await generateWord(invoiceData, signatureName, signatureImage, true);
+        saveAs(blob, "invoice.docx");
         break;
       case "rtf":
-        blob = generateRTF(invoiceData, signatureName, signatureImage, false);
+        blob = await generateRTF(invoiceData, signatureName, signatureImage, true);
         saveAs(blob, "invoice.rtf");
         break;
       default:
