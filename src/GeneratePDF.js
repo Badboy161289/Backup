@@ -31,7 +31,7 @@ export const generatePDF = (invoiceData, signatureName, signatureImage, withSign
     doc.text(`Signed by: ${signatureName}`, 10, doc.autoTable.previous.finalY + 40);
 
     if (signatureImage) {
-      doc.addImage(signatureImage, 'PNG', 10, doc.autoTable.previous.finalY + 50, 40, 20); // Adjust dimensions and position as needed
+      doc.addImage(signatureImage, 'PNG', 10, doc.autoTable.previous.finalY + 50, 30, 20); // Adjust dimensions and position as needed
     }
   }
 
