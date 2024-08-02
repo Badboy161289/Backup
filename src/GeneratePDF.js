@@ -12,6 +12,7 @@ export const generatePDF = (invoiceData, signatureName, signatureImage, withSign
   doc.text(`Date: ${invoiceData.date}`, 10, 20);
   doc.text(`Company: ${invoiceData.company}`, 10, 30);
   doc.text(`Address: ${invoiceData.address}`, 10, 40);
+  doc.text(`Billing Address: ${invoiceData.billing_address}`, 10, 50);
   doc.autoTable({
     startY: 50,
     head: [["Description", "Quantity", "Price", "Total"]],
