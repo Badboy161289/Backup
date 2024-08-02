@@ -9,7 +9,9 @@
     { "description": "Item 4", "quantity": 50, "price": 50 },
     { "description": "Item 5", "quantity": 10, "price": 50 },
     { "description": "Item 6", "quantity": 10, "price": 50 },
-    { "description": "Item 7", "quantity": 20, "price": 50 }
+    { "description": "Item 7", "quantity": 20, "price": 50 },
+    { "description": "Item 8", "quantity": 10, "price": 20 }
   ],
-  "discount": 30
+  "discount": 30,
+  "lastInvoiceNumber": 0
 }

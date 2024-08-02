@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const InvoicePreview = ({ invoiceData, calculateTotal }) => {
+const InvoicePreview = ({ invoiceData, calculateTotal,invoiceIDGenerate  }) => {
   if (!invoiceData) {
     return <div>No invoice data available</div>;
   }
@@ -14,6 +14,7 @@ const InvoicePreview = ({ invoiceData, calculateTotal }) => {
     <div className="invoice-preview">
       <h1>Invoice Preview</h1>
       <p>Date: {invoiceData.date}</p>
+      <p>Invoice ID : {invoiceIDGenerate } </p>
       <p>Company: {invoiceData.company}</p>
       <p>Address: {invoiceData.address}</p>
       <table className="table">
