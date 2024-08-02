@@ -3,7 +3,9 @@ import DownloadDropdown from "./DownloadDropdown";
 import PreviewModal from "./PreviewModal";
 import SignatureModal from "./SignatureModal";
 //import { invoiceData } from "./data";
-import invoiceData from './invoiceData.json';
+// import invoiceData from './invoiceData';
+// import {invoices} from './firebase/fetchInvoiceData.js'
+import {fetchInvoiceData} from './firebase/fetchInvoiceData.js'
 import { generatePDF } from "./GeneratePDF";
 import { generateWord } from "./GenerateWord";
 import { generateRTF } from "./GenerateRTF";
@@ -18,11 +20,17 @@ const calculateTotal = (items, discount) => {
 };
 
 export default function MainCompo() {
+  // console.log(invoices[0]);
+  // const invoiceData=invoices[0];
   const [previewContent, setPreviewContent] = useState(null);
   const [signatureName, setSignatureName] = useState("");
   const [signatureImage, setSignatureImage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [previewType, setPreviewType] = useState("");
+  const [invoiceData,setinvoiceData]=useState(null);
+
+  fetchInvoiceData().then((data) => setinvoiceData(data[0]));
+
 
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);

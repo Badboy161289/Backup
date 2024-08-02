@@ -16,6 +16,7 @@ const InvoicePreview = ({ invoiceData, calculateTotal }) => {
       <p>Date: {invoiceData.date}</p>
       <p>Company: {invoiceData.company}</p>
       <p>Address: {invoiceData.address}</p>
+      <p>Billing Address: {invoiceData.billing_address}</p> {/* Added Billing Address */}
       <table className="table">
         <thead>
           <tr>
@@ -56,6 +57,7 @@ InvoicePreview.propTypes = {
   invoiceData: PropTypes.shape({
     company: PropTypes.string,
     address: PropTypes.string,
+    billing_address: PropTypes.string, // Added Billing Address
     date: PropTypes.string,
     items: PropTypes.arrayOf(
       PropTypes.shape({
