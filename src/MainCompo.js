@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import InvoicePreview from "./InvoicePreview";
 import DownloadDropdown from "./DownloadDropdown";
 import PreviewModal from "./PreviewModal";
@@ -6,12 +7,12 @@ import SignatureModal from "./SignatureModal";
 // import invoiceData from './invoiceData';
 // import {invoices} from './firebase/fetchInvoiceData.js'
 import {fetchInvoiceData} from './firebase/fetchInvoiceData.js'
+import invoiceData from './invoiceData.json';
 import { generatePDF } from "./GeneratePDF";
 import { generateWord } from "./GenerateWord";
 import { generateRTF } from "./GenerateRTF";
 import { Button } from "react-bootstrap";
 import { saveAs } from "file-saver";
-import React, { useState } from "react";
 
 const calculateTotal = (items, discount) => {
   const subtotal = items.reduce((total, item) => total + item.quantity * item.price, 0);
@@ -31,6 +32,44 @@ export default function MainCompo() {
 
   fetchInvoiceData().then((data) => setinvoiceData(data[0]));
 
+  const [invoiceId, setInvoiceId] = useState("");
+  const [signatureOption, setSignatureOption] = useState("digital");
+  const [lastInvoiceNumber, setLastInvoiceNumber] = useState(0);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem('invoiceData');
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      setLastInvoiceNumber(parsedData.lastInvoiceNumber);
+    } else {
+      setLastInvoiceNumber(invoiceData.lastInvoiceNumber);
+    }
+  }, []);
+
+  function generateInvoiceID() {
+    const newInvoiceNumber = lastInvoiceNumber + 1;
+    setLastInvoiceNumber(newInvoiceNumber);
+
+    const d = new Date();
+    let day = d.getDate();
+    let year = d.getFullYear();
+    let month = d.getMonth() + 1;
+
+    day = day < 10 ? '0' + day : day;
+    month = month < 10 ? '0' + month : month;
+
+    let date = `${day}/${month}/${year}`;
+    let id = `${date}-${newInvoiceNumber}`;
+
+    const updatedInvoiceData = { ...invoiceData, lastInvoiceNumber: newInvoiceNumber };
+    localStorage.setItem('invoiceData', JSON.stringify(updatedInvoiceData));
+
+    return id;
+  }
+
+  useEffect(() => {
+    setInvoiceId(generateInvoiceID());
+  }, []);
 
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
@@ -57,7 +96,7 @@ export default function MainCompo() {
 
     switch (type) {
       case "pdf":
-        blob = await generatePDF(invoiceData, signatureName, signatureImage, true);
+        blob = await generatePDF(invoiceData, signatureName, signatureImage, true, invoiceId);
         setPreviewContent(URL.createObjectURL(blob));
         break;
       case "word":
@@ -77,7 +116,7 @@ export default function MainCompo() {
     let blob;
     switch (previewType) {
       case "pdf":
-        blob = await generatePDF(invoiceData, signatureName, signatureImage, true);
+        blob = await generatePDF(invoiceData, signatureName, signatureImage, true, invoiceId);
         saveAs(blob, "invoice.pdf");
         break;
       case "word":
@@ -91,11 +130,16 @@ export default function MainCompo() {
       default:
         return;
     }
+
+    const updatedInvoiceNumber = lastInvoiceNumber + 1;
+    const updatedInvoiceData = { ...invoiceData, lastInvoiceNumber: updatedInvoiceNumber };
+    setLastInvoiceNumber(updatedInvoiceNumber);
+    localStorage.setItem('invoiceData', JSON.stringify(updatedInvoiceData));
   };
 
   return (
     <div className="container mt-5">
-      <InvoicePreview invoiceData={invoiceData} calculateTotal={calculateTotal} />
+      <InvoicePreview invoiceData={invoiceData} calculateTotal={calculateTotal} invoiceIDGenerate={invoiceId} />
       <div className="text-center my-3">
         <Button variant="primary" onClick={handleShow}>
           Add Signature
@@ -116,6 +160,8 @@ export default function MainCompo() {
         handleSignatureNameChange={handleSignatureNameChange}
         addSignature={addSignature}
         setSignatureImage={setSignatureImage}
+        signatureOption={signatureOption}
+        setSignatureOption={setSignatureOption}
       />
     </div>
   );
