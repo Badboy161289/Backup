@@ -14,6 +14,7 @@ const SignatureModal = ({
   const [imagePreview, setImagePreview] = useState("");
   const [drawing, setDrawing] = useState(false);
   const canvasRef = useRef(null);
+  const [status,setStatus]=useState(false);
 
   // Initialize canvas context when the modal is shown
   useEffect(() => {
@@ -79,6 +80,7 @@ const SignatureModal = ({
       const canvas = canvasRef.current;
       const dataURL = canvas.toDataURL();
       setSignatureImage(dataURL);
+      setStatus(true);
     }
   };
 
@@ -130,9 +132,16 @@ const SignatureModal = ({
                 <Button variant="secondary" onClick={clearCanvas} className="mt-2">
                   Clear
                 </Button>
-                <Button variant="primary" onClick={saveCanvas} className="mt-2">
-                  Save
-                </Button>
+                <Button
+  variant={status === false ? 'primary' : 'success'}
+  onClick={saveCanvas}
+  className="mt-2"
+  disabled={status === true}
+>
+  {status === false ? 'Save' : 'Saved'}
+</Button>
+
+
               </Form.Group>
             </>
           )}

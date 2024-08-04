@@ -1,20 +1,18 @@
-import React, { useRef, useState,useEffect } from "react";
-
+import React, { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import { storeInvoiceData } from "./firebase/storeInvoiceData";
 import MainCompo from "./MainCompo";
 
-
-
-const App = () => {  
-  
+const App = () => {
   useEffect(() => {
-    storeInvoiceData();
-  }, []);
-  return (
-    <MainCompo/>
-  );
+    const initializeData = async () => {
+      await storeInvoiceData();
+    };
+
+    initializeData();
+  }, []); // Empty dependency array ensures this runs only once
+
+  return <MainCompo />;
 };
 
 export default App;

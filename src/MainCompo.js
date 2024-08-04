@@ -1,18 +1,186 @@
+// import React, { useState, useEffect } from "react";
+// import InvoicePreview from "./InvoicePreview";
+// import DownloadDropdown from "./DownloadDropdown";
+// import PreviewModal from "./PreviewModal";
+// import SignatureModal from "./SignatureModal";
+// //import { invoiceData } from "./data";
+// // import invoiceData from './invoiceData';
+// // import {invoices} from './firebase/fetchInvoiceData.js'
+// import {fetchInvoiceData} from './firebase/fetchInvoiceData.js'
+// // import invoiceData from './invoiceData.json';
+// import { generatePDF } from "./GeneratePDF";
+// import { generateWord } from "./GenerateWord";
+// import { generateRTF } from "./GenerateRTF";
+// import { Button } from "react-bootstrap";
+// import { saveAs } from "file-saver";
+
+// const calculateTotal = (items, discount) => {
+//   const subtotal = items.reduce((total, item) => total + item.quantity * item.price, 0);
+//   const discountAmount = (subtotal * discount) / 100;
+//   return subtotal - discountAmount;
+// };
+
+// export default function MainCompo() {
+//   // console.log(invoices[0]);
+//   // const invoiceData=invoices[0];
+//   const [previewContent, setPreviewContent] = useState(null);
+//   const [signatureName, setSignatureName] = useState("");
+//   const [signatureImage, setSignatureImage] = useState("");
+//   const [showModal, setShowModal] = useState(false);
+//   const [previewType, setPreviewType] = useState("");
+//   const [invoiceData,setinvoiceData]=useState(null);
+
+//   fetchInvoiceData().then((data) => setinvoiceData(data[0]));
+
+//   const [invoiceId, setInvoiceId] = useState("");
+//   const [signatureOption, setSignatureOption] = useState("digital");
+//   const [lastInvoiceNumber, setLastInvoiceNumber] = useState(0);
+
+//   useEffect(() => {
+//     const storedData = localStorage.getItem('invoiceData');
+//     if (storedData) {
+//       const parsedData = JSON.parse(storedData);
+//       setLastInvoiceNumber(parsedData.lastInvoiceNumber);
+//     } else {
+//       setLastInvoiceNumber(invoiceData.lastInvoiceNumber);
+//     }
+//   }, []);
+
+//   function generateInvoiceID() {
+//     const newInvoiceNumber = lastInvoiceNumber + 1;
+//     setLastInvoiceNumber(newInvoiceNumber);
+
+//     const d = new Date();
+//     let day = d.getDate();
+//     let year = d.getFullYear();
+//     let month = d.getMonth() + 1;
+
+//     day = day < 10 ? '0' + day : day;
+//     month = month < 10 ? '0' + month : month;
+
+//     let date = `${day}/${month}/${year}`;
+//     let id = `${date}-${newInvoiceNumber}`;
+
+//     const updatedInvoiceData = { ...invoiceData, lastInvoiceNumber: newInvoiceNumber };
+//     localStorage.setItem('invoiceData', JSON.stringify(updatedInvoiceData));
+
+//     return id;
+//   }
+
+//   useEffect(() => {
+//     setInvoiceId(generateInvoiceID());
+//   }, []);
+
+//   const handleShow = () => setShowModal(true);
+//   const handleClose = () => setShowModal(false);
+
+//   const handleSignatureNameChange = (e) => setSignatureName(e.target.value);
+
+//   const addSignature = () => {
+//     if (!signatureName) {
+//       alert("Please enter your name to sign the document.");
+//       return;
+//     }
+//     handleClose();
+//   };
+
+//   const handlePreview = async (type) => {
+//     if (!signatureName || !signatureImage) {
+//       alert("Please add a signature before previewing the invoice.");
+//       handleShow();
+//       return;
+//     }
+
+//     setPreviewType(type);
+//     let blob;
+
+//     switch (type) {
+//       case "pdf":
+//         blob = await generatePDF(invoiceData, signatureName, signatureImage, true, invoiceId);
+//         setPreviewContent(URL.createObjectURL(blob));
+//         break;
+//       case "word":
+//         blob = await generateWord(invoiceData, signatureName, signatureImage, true);
+//         setPreviewContent(URL.createObjectURL(blob));
+//         break;
+//       case "rtf":
+//         blob = await generateRTF(invoiceData, signatureName, signatureImage, true);
+//         setPreviewContent(URL.createObjectURL(blob));
+//         break;
+//       default:
+//         return;
+//     }
+//   };
+
+//   const handleDownload = async () => {
+//     let blob;
+//     switch (previewType) {
+//       case "pdf":
+//         blob = await generatePDF(invoiceData, signatureName, signatureImage, true, invoiceId);
+//         saveAs(blob, "invoice.pdf");
+//         break;
+//       case "word":
+//         blob = await generateWord(invoiceData, signatureName, signatureImage, true);
+//         saveAs(blob, "invoice.docx");
+//         break;
+//       case "rtf":
+//         blob = await generateRTF(invoiceData, signatureName, signatureImage, true);
+//         saveAs(blob, "invoice.rtf");
+//         break;
+//       default:
+//         return;
+//     }
+
+//     const updatedInvoiceNumber = lastInvoiceNumber + 1;
+//     const updatedInvoiceData = { ...invoiceData, lastInvoiceNumber: updatedInvoiceNumber };
+//     setLastInvoiceNumber(updatedInvoiceNumber);
+//     localStorage.setItem('invoiceData', JSON.stringify(updatedInvoiceData));
+//   };
+
+//   return (
+//     <div className="container mt-5">
+//       <InvoicePreview invoiceData={invoiceData} calculateTotal={calculateTotal} invoiceIDGenerate={invoiceId} />
+//       <div className="text-center my-3">
+//         <Button variant="primary" onClick={handleShow}>
+//           Add Signature
+//         </Button>
+//       </div>
+//       <DownloadDropdown handlePreview={handlePreview} />
+//       <PreviewModal
+//         previewType={previewType}
+//         previewContent={previewContent}
+//         handleDownload={handleDownload}
+//         handleClose={() => setPreviewContent(null)}
+//         handleShowSignature={handleShow}
+//       />
+//       <SignatureModal
+//         showModal={showModal}
+//         handleClose={handleClose}
+//         signatureName={signatureName}
+//         handleSignatureNameChange={handleSignatureNameChange}
+//         addSignature={addSignature}
+//         setSignatureImage={setSignatureImage}
+//         signatureOption={signatureOption}
+//         setSignatureOption={setSignatureOption}
+//       />
+//     </div>
+//   );
+// }
+
+
 import React, { useState, useEffect } from "react";
 import InvoicePreview from "./InvoicePreview";
 import DownloadDropdown from "./DownloadDropdown";
 import PreviewModal from "./PreviewModal";
 import SignatureModal from "./SignatureModal";
-//import { invoiceData } from "./data";
-// import invoiceData from './invoiceData';
-// import {invoices} from './firebase/fetchInvoiceData.js'
-import {fetchInvoiceData} from './firebase/fetchInvoiceData.js'
-import invoiceData from './invoiceData.json';
+import { fetchInvoiceData } from './firebase/fetchInvoiceData.js'
 import { generatePDF } from "./GeneratePDF";
 import { generateWord } from "./GenerateWord";
 import { generateRTF } from "./GenerateRTF";
 import { Button } from "react-bootstrap";
 import { saveAs } from "file-saver";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "./firebase/firebase.js";
 
 const calculateTotal = (items, discount) => {
   const subtotal = items.reduce((total, item) => total + item.quantity * item.price, 0);
@@ -21,32 +189,35 @@ const calculateTotal = (items, discount) => {
 };
 
 export default function MainCompo() {
-  // console.log(invoices[0]);
-  // const invoiceData=invoices[0];
   const [previewContent, setPreviewContent] = useState(null);
   const [signatureName, setSignatureName] = useState("");
   const [signatureImage, setSignatureImage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [previewType, setPreviewType] = useState("");
-  const [invoiceData,setinvoiceData]=useState(null);
-
-  fetchInvoiceData().then((data) => setinvoiceData(data[0]));
-
+  const [invoiceData, setInvoiceData] = useState(null);
   const [invoiceId, setInvoiceId] = useState("");
   const [signatureOption, setSignatureOption] = useState("digital");
   const [lastInvoiceNumber, setLastInvoiceNumber] = useState(0);
 
+  fetchInvoiceData().then((data) => setInvoiceData(data[0]));
+
   useEffect(() => {
-    const storedData = localStorage.getItem('invoiceData');
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      setLastInvoiceNumber(parsedData.lastInvoiceNumber);
-    } else {
-      setLastInvoiceNumber(invoiceData.lastInvoiceNumber);
-    }
+    const fetchInvoiceNumber = async () => {
+      const id = await generateInvoiceID();
+      setInvoiceId(id);
+    };
+    fetchInvoiceNumber();
   }, []);
 
-  function generateInvoiceID() {
+  async function generateInvoiceID() {
+    const invoiceDocRef = doc(db, "invoices", "invoiceMeta");
+    const invoiceDoc = await getDoc(invoiceDocRef);
+    let lastInvoiceNumber = 0;
+
+    if (invoiceDoc.exists()) {
+      lastInvoiceNumber = invoiceDoc.data().lastInvoiceNumber;
+    }
+
     const newInvoiceNumber = lastInvoiceNumber + 1;
     setLastInvoiceNumber(newInvoiceNumber);
 
@@ -59,17 +230,14 @@ export default function MainCompo() {
     month = month < 10 ? '0' + month : month;
 
     let date = `${day}/${month}/${year}`;
-    let id = `${date}-${newInvoiceNumber}`;
+    let id = `${newInvoiceNumber}`;
 
-    const updatedInvoiceData = { ...invoiceData, lastInvoiceNumber: newInvoiceNumber };
-    localStorage.setItem('invoiceData', JSON.stringify(updatedInvoiceData));
+    await updateDoc(invoiceDocRef, {
+      lastInvoiceNumber: newInvoiceNumber
+    });
 
     return id;
   }
-
-  useEffect(() => {
-    setInvoiceId(generateInvoiceID());
-  }, []);
 
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
@@ -120,21 +288,22 @@ export default function MainCompo() {
         saveAs(blob, "invoice.pdf");
         break;
       case "word":
-        blob = await generateWord(invoiceData, signatureName, signatureImage, true);
+        blob = await generateWord(invoiceData, signatureName, signatureImage, true,invoiceId);
         saveAs(blob, "invoice.docx");
         break;
       case "rtf":
-        blob = await generateRTF(invoiceData, signatureName, signatureImage, true);
+        blob = await generateRTF(invoiceData, signatureName, signatureImage, true,invoiceId);
         saveAs(blob, "invoice.rtf");
         break;
       default:
         return;
     }
 
-    const updatedInvoiceNumber = lastInvoiceNumber + 1;
-    const updatedInvoiceData = { ...invoiceData, lastInvoiceNumber: updatedInvoiceNumber };
-    setLastInvoiceNumber(updatedInvoiceNumber);
-    localStorage.setItem('invoiceData', JSON.stringify(updatedInvoiceData));
+    // Update Firestore with the new last invoice number
+    const invoiceDocRef = doc(db, "invoices", "invoiceMeta");
+    await updateDoc(invoiceDocRef, {
+      lastInvoiceNumber: lastInvoiceNumber
+    });
   };
 
   return (

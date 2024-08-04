@@ -8,7 +8,7 @@ import {
   WidthType,
 } from "docx";
 
-export const generateWord = async (invoiceData, signatureName, withSignature) => {
+export const generateWord = async (invoiceData, signatureName, withSignature, invoiceId) => {
   const subtotal = invoiceData.items.reduce((total, item) => total + item.quantity * item.price, 0);
   const discountAmount = (subtotal * invoiceData.discount) / 100;
   const total = subtotal - discountAmount;
@@ -20,9 +20,10 @@ export const generateWord = async (invoiceData, signatureName, withSignature) =>
         children: [
           new Paragraph({ text: "Invoice", heading: "Heading1" }),
           new Paragraph({ text: `Date: ${invoiceData.date}` }),
+          new Paragraph({ text: `Invoice ID: ${invoiceId}` }), // Added Invoice ID
           new Paragraph({ text: `Company: ${invoiceData.company}` }),
           new Paragraph({ text: `Address: ${invoiceData.address}` }),
-          new Paragraph({ text: `Billing Address: ${invoiceData.billing_address}` }), // Added billing address
+          new Paragraph({ text: `Billing Address: ${invoiceData.billing_address}` }),
 
           new Table({
             rows: [
