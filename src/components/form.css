@@ -13,15 +13,12 @@ body{
 .form .container
 {
     max-width: 100%;
-}
-
-.form .container form
-{
     display: flex;
     flex-direction: column;
 }
 
-.form .container form input
+
+.form .container  input
 {
     margin: 10px 20px;
     padding: 10px 10px;
@@ -33,7 +30,7 @@ body{
     color: #0d0d0d;
 }
 
-.form .container form button
+.form .container  button
 {
      width: 100px;
      padding: 10px 0px;
