@@ -77,7 +77,7 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is imported
+import "bootstrap/dist/css/bootstrap.min.css"; 
 
 const InvoicePreview = ({ invoiceData, calculateTotal, invoiceIDGenerate }) => {
   if (!invoiceData) {
