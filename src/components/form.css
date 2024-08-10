@@ -1,44 +1,130 @@
-body{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    flex-direction: column;
-}
-.form{
-    padding: 20px 30px;
-    background: #f4f4f4;
-    border-radius: 5px;
-}
-.form .container
-{
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
-
-.form .container  input
-{
-    margin: 10px 20px;
-    padding: 10px 10px;
-    width: 500px;
-    background: none;
-    border: none;
-    outline: none;
-    border-bottom:1px solid black ;
-    color: #0d0d0d;
+.form {
+  padding: 20px 30px;
+  background: #f4f4f4;
+  border-radius: 5px;
 }
 
-.form .container  button
+.form .container {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.form .container input {
+  margin: 10px 20px;
+  padding: 10px;
+  width: 500px;
+  background: none;
+  border: none;
+  outline: none;
+  border-bottom: 1px solid black;
+  color: #0d0d0d;
+}
+
+.form .container button {
+  margin-top: 10px;
+  width: 100px;
+  padding: 10px 0;
+  margin-left: 30px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: #0cc0df;
+}
+
+.save
 {
-    margin-top: 10px;
-     width: 100px;
-     padding: 10px 0px;
-     margin-left: 30px;
-     cursor: pointer;
-     border: none;
-     outline: none;
-     background: #0cc0df; 
-     
+  margin-top: 10px;
+  width: 100px;
+  padding: 10px 0;
+  margin-left: 30px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: #0cc0df;
+}
+
+.table-container {
+  margin: 20px;
+  overflow-x: auto;
+}
+
+.styled-table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 18px;
+  min-width: 400px;
+  width: 100%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+}
+
+.styled-table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #009879;
+}
+
+.styled-table tbody tr.active-row {
+  font-weight: bold;
+  color: #009879;
+}
+
+.update-button {
+  background-color: #009879;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.update-button:hover {
+  background-color: #007f63;
+}
+
+.delete-button {
+  background-color: rgb(255, 81, 81);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.delete-button:hover {
+  background-color: red;
+}
+
+.total-set
+{
+  margin-left: 270px;
 }

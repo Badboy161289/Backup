@@ -1,0 +1,11 @@
+.box{
+    display: flex;
+    gap:  50px;
+    background-color: rgb(207, 207, 207);
+    margin-top: 10px;
+    padding: 20px;
+}
+
+.box p{
+    width: 20%;
+}
