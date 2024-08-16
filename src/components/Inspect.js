@@ -1,9 +1,13 @@
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 import { db } from '../firebase';
 import './Inspect.css';
+import { useNavigate } from 'react-router-dom';
 const Inspect = () => {
     const [display,setDisplay] = useState([]);
+
+    const navigate = useNavigate();
+
 
     useEffect(()=>
     {
@@ -22,15 +26,35 @@ const Inspect = () => {
         //console.log(data);
         setDisplay(data);
     }
+
+    const deletData = async (id) =>
+    {
+      const confirmation = (window.confirm("You Sure You Want to Delete Data"));
+      if(confirmation)
+      {
+        try {
+          await deleteDoc(doc(db,'quotation',id));
+          getData();
+        } catch (error) {
+         window.alert("Something Went Wrong"); 
+        }
+      }
+      else{
+        alert("Data Not Deleted")
+      }
+    }
   return (
     <div>
+      <h1><strong>All Data</strong></h1>
       {
         display.map(data =>(
             <div className='box' key={data.id}>
-                <p>{data.id}</p><br></br>
-                <p>{new Date(data.date.seconds * 1000).toLocaleDateString()}</p>
-                <p>{data.customer}</p>
-                <p>{data.total}</p>
+                <p><strong>Invoice ID:</strong> {data.id}</p><br></br>
+                <p><strong>Date:</strong>{new Date(data.date.seconds * 1000).toLocaleDateString()}</p>
+                <p><strong>Customer Name: </strong>{data.customer}</p>
+                <p><strong>Total:</strong> ₹{data.total}</p>
+                <button className='delete-btn' onClick={()=>deletData(data.id)}>Delete</button>
+                <button onClick={()=>{navigate('/details',{state:data})}} className='view-btn'>View</button>
 
             </div>
         ))

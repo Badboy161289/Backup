@@ -1,0 +1,80 @@
+/* Base styles for desktop */
+.wrapper {
+    width: 100vw;
+    background-color: whitesmoke;
+    min-height: 90vh;
+    margin: auto;
+}
+
+.header-wrapper {
+    display: flex;
+    margin-left: 400px;
+    padding: 20px;
+}
+
+.product-table {
+    margin-top: 50px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-header {
+    background-color: rgb(175, 175, 255);
+}
+
+th, td {
+    border: 1px solid;
+    padding: 10px;
+}
+
+/* Responsive styles for tablets and smartphones */
+@media (max-width: 768px) {
+    .header-wrapper {
+        margin-left: 0;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .product-table {
+        margin-top: 30px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}
+
+/* Responsive styles for smartphones */
+@media (max-width: 480px) {
+    .wrapper {
+        padding: 10px;
+    }
+
+    .header-wrapper {
+        flex-direction: column;
+        margin-left: 0;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .product-table {
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 6px;
+        font-size: 14px;
+    }
+}
+
+.download-button{
+    margin-top: 10px;
+    background-color: rgba(0, 0, 255, 0.856);
+    color: white;
+    border: none;
+    padding: 7px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    
+    
+}

@@ -124,13 +124,21 @@ const Form = ({refer}) => {
 
     const addItem =() =>
     {
-      setProduct([...product,{'id':product.length, 'Item':Item ,'Quntity':Quntity,'Price':Price}]);
+      if (!customer || !Item || !Quntity || !Price) {
+        alert('All fields are required!');
+        return;
+      }
+    
       
-      const t = Quntity * Price;
-      setTotalPrice(totalPrice+t);
-      setItem('');
-      setPrice(0);
-      setQuntity(1);
+        setProduct([...product,{'id':product.length, 'Item':Item ,'Quntity':Quntity,'Price':Price}]);
+      
+        const t = Quntity * Price;
+        setTotalPrice(totalPrice+t);
+        setItem('');
+        setPrice(0);
+        setQuntity(1);
+      
+     
     }
 
     const deletedata =(i) =>
@@ -176,6 +184,10 @@ const Form = ({refer}) => {
       console.log(product);
       console.log(customer);
       console.log(totalPrice);
+      if (!customer && !product) {
+        alert('All fields are required!');
+        return;
+      }
       const data = await addDoc(collection(db,'quotation'),
       {
         customer : customer,
@@ -183,11 +195,15 @@ const Form = ({refer}) => {
         total : totalPrice,
         date: Timestamp.fromDate(new Date())
       }
-    )
-    console.log(data)
-    navigate('/display')  
+    );
+    console.log(data);
+    navigate('/display');  
   }
 
+  const todisplay = () =>
+  {
+    navigate('/display');
+  }
 
   return (
     <>
@@ -282,6 +298,7 @@ const Form = ({refer}) => {
         
       </div>
       <button className='save' onClick={tosave}>Save</button>
+      <button className='display-data' onClick={todisplay}>All Data Display</button>
     </>
   )
 }

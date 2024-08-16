@@ -1,11 +1,67 @@
-.box{
-    display: flex;
-    gap:  50px;
-    background-color: rgb(207, 207, 207);
-    margin-top: 10px;
-    padding: 20px;
+/* Base styles for desktop */
+.box {
+  display: flex;
+  gap: 50px;
+  background-color: rgb(207, 207, 207);
+  margin-top: 10px;
+  padding: 20px;
 }
 
-.box p{
-    width: 20%;
+.box p {
+  width: 20%;
+}
+
+.delete-btn {
+  background-color: rgb(255, 81, 81);
+  color: white;
+  border: none;
+  padding: 7px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.delete-btn:hover {
+  background-color: red;
+}
+
+.view-btn {
+  background-color: rgb(72, 72, 230);
+  color: white;
+  border: none;
+  padding: 7px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.view-btn:hover {
+  background-color: blue;
+}
+
+/* Responsive styles for tablets and smartphones */
+@media (max-width: 768px) {
+  .box {
+      flex-direction: column;
+      gap: 20px;
+      padding: 10px;
+  }
+
+  .box p {
+      width: 100%;
+      text-align: center;
+  }
+
+  .delete-btn, .view-btn {
+      padding: 5px 15px;
+  }
+}
+
+/* Responsive styles for smartphones */
+@media (max-width: 480px) {
+  .box {
+      padding: 5px;
+  }
+
+  .delete-btn, .view-btn {
+      padding: 5px 10px;
+  }
 }
