@@ -204,6 +204,10 @@ const Form = ({refer}) => {
   {
     navigate('/display');
   }
+  const totemplate = () =>
+    {
+      navigate('/template');
+    }
 
   return (
     <>
@@ -299,6 +303,7 @@ const Form = ({refer}) => {
       </div>
       <button className='save' onClick={tosave}>Save</button>
       <button className='display-data' onClick={todisplay}>All Data Display</button>
+      <button className='display-data' onClick={totemplate}>All Templates</button>
     </>
   )
 }

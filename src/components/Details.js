@@ -17,20 +17,20 @@ const Details = () => {
 
     // Add customer name
     doc.setFontSize(14);
-    doc.text(`Customer Name: ${data.customer}`, 14, 30);
+    doc.text(`Customer Name: ${location.state.data.customer}`, 14, 30);
 
     // Add table
     doc.autoTable({
       startY: 40,
       head: [['S.No', 'Product Name', 'Price', 'Quantity', 'Total']],
-      body: data.product.map((product, index) => [
+      body: location.state.data.product.map((product, index) => [
         index + 1,
         product.Item,
         product.Price,
         product.Quntity,
         product.Quntity * product.Price,
       ]),
-      foot: [['Total', '', '', '', data.total]],
+      foot: [['Total', '', '', '', location.state.data.total]],
       theme: 'striped',
     });
 
@@ -41,10 +41,11 @@ const Details = () => {
   return (
     <div>
       <h2>Quotation</h2>
+      <img src={location.state.val.Image}></img>
       
       <div className='wrapper'>
         <div className='header-wrapper'>
-          <p><strong>Customer Name:</strong> {data.customer}</p>
+          <p><strong>Customer Name:</strong> {location.state.data.customer}</p>
         </div>
         <table className='product-table'>
           <thead>
@@ -57,7 +58,7 @@ const Details = () => {
             </tr>
           </thead>
           <tbody>
-            {data.product.map((product, index) => (
+            {location.state.data.product.map((product, index) => (
               <tr key={product.id}>
                 <td>{index + 1}</td>
                 <td>{product.Item}</td>
@@ -70,7 +71,7 @@ const Details = () => {
           <tfoot>
             <tr>
               <td className='table-header' colSpan="4">Total</td>
-              <td>{data.total}</td>
+              <td>{location.state.data.total}</td>
             </tr>
           </tfoot>
         </table>
@@ -78,6 +79,8 @@ const Details = () => {
         Download as PDF
       </button>
       </div>
+      
+      <p>{location.state.val.Rules}</p>
       
     </div>
   );

@@ -139,6 +139,45 @@ body {
   margin-left: 270px;
 }
 
+.card{
+  
+  background-color: lightgrey;
+  
+  
+}
+.card .contain{
+  max-width: 120vh;
+  
+  margin-top: 5vh;
+  display: flex;
+  gap: 10px;
+  border: solid black;
+  
+}
+
+.card .contain img{
+  max-width: 20vh;
+  max-height: 20vh;
+  margin: auto;
+  padding: 10px;
+
+}
+.card .contain p{
+  margin: auto;
+  padding: 10px;
+}
+.card .contain button{
+  max-width: 20vh;
+  max-height:5vh ;
+  padding: 10px;
+  margin-top: 12vh;
+  
+  
+}
+
+
+
+
 /* Responsive styles for tablets and smartphones */
 @media (max-width: 768px) {
   .form {
