@@ -9,6 +9,10 @@ const Template = () => {
     const [img, setImg] = useState();  
     const [url, setUrl] = useState();
     const [fetch,setFetch] = useState([]);
+
+    const [template, setTemplate] = useState();
+    const [title,setTitle] = useState();
+    const [term, setTerm] = useState([]);
     
     //database ref
     const dbref = collection(db,"Temp");
@@ -23,7 +27,7 @@ const Template = () => {
             console.log(url)
             if(downloadUrl)
             {
-                const add_data = await addDoc(dbref,{Rules:rules,Image:url})
+                const add_data = await addDoc(dbref,{Template:template,Term:term,Image:url})
                 if(add_data)
                 {
                     alert("Data Stored ");
@@ -35,6 +39,14 @@ const Template = () => {
             alert("Data Stored not ")
          }
     }
+    
+    const termview = () =>
+    {
+        setTerm([...term,{'id':term.length,'Title':title,'Rules':rules}]);
+        setRules(''); 
+        setTitle('');
+    }
+
 
     useEffect(()=>
     {
@@ -52,13 +64,65 @@ const Template = () => {
 
     return (
     <>
+        
+
+
+
+
+
+
+
+
         <div className='form'>
             <div className='container'>
             <input type='file' onChange={(e)=> setImg(e.target.files[0])}></input>
+            <input type='text' name='template' placeholder='Enter Template Name' value={template}  onChange={(e)=> setTemplate(e.target.value)}  required></input>
+            <input type='text' name='title' placeholder='Enter Policy Title' value={title}  onChange={(e)=> setTitle(e.target.value)}  required></input>
             <textarea name='Rules' rows={4} cols={40} placeholder='Terms and Conditions' value={rules} onChange={(e)=> setRules(e.target.value)}></textarea>
-            <button onClick={addData}>Submit</button>
+            <button onClick={termview}>Submit</button>
+            <button onClick={addData}>Save</button>
             </div>
         </div>
+
+
+        <div>
+            <table>
+                <thead>
+                <th>Sr.No</th>
+                <th>Title</th>
+                <th>Rules</th>
+                </thead>
+            
+                {
+                    term.map((curElm,index)=>
+                    {
+                        return(
+                            <>
+                                <tbody>
+                                    <tr key={index}>
+
+                                        <td>{index+1}</td>
+                                        <td>{curElm.Title}</td>
+                                        <td>{curElm.Rules}</td>
+
+                                        
+
+                                    </tr>
+                                </tbody>
+                            </>
+                        )
+
+                    })
+                }
+           
+            </table>
+        </div>  
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+
         <div className='card'>
             {
                 fetch.map(
@@ -70,7 +134,7 @@ const Template = () => {
                                         <img  src={curElm.Image}/>
                                     </div>
                                     <div>
-                                        <p >{curElm.Rules}</p>
+                                        <p>Name:{curElm.Template}</p>
                                         
                                     </div>
                                     <button>Submit</button>
@@ -83,6 +147,8 @@ const Template = () => {
                 )
             }
         </div>
+
+        
        
     </>
   )

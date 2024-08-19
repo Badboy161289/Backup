@@ -1,80 +1,143 @@
 /* Base styles for desktop */
-.wrapper {
-    width: 100vw;
-    background-color: whitesmoke;
-    min-height: 90vh;
+.datalink {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    background-color: red;
+    padding: 1rem;
+}
+
+.datalink .title {
     margin: auto;
 }
 
-.header-wrapper {
+.datalink .todata {
+    margin-top: 2vh;
+    background-color: green;
     display: flex;
-    margin-left: 400px;
-    padding: 20px;
+    max-width: 100%;
 }
 
-.product-table {
-    margin-top: 50px;
+.datalink .todata .todata-send {
+    background-color: yellow;
+    display: flex;
+    flex-direction: column;
+}
+
+.datalink .todata .todata-recive {
+    background-color: floralwhite;
+    margin-left: 56vh;
+    /* Adjust width for smaller screens */
+    width: auto;
+}
+
+.datalink .datalink-header {
+    background-color: wheat;
+    display: flex;
+    gap: 2vh;
+    margin-left: 40rem;
+    width: 30vh;
+}
+
+.datalink .datalink-header .dataimg {
+    border-radius: 50px;
+    height: 10vh;
+    width: 10vh;
+}
+
+.datalink .datalink-header .datatext {
+    margin-top: 2vh;
+}
+
+.datalink .datacontainer {
+    background-color: gold;
+    max-width: 100%;
+}
+
+.datalink .datacontainer .wrapper {
+    background-color: navajowhite;
     width: 100%;
-    border-collapse: collapse;
+    overflow-x: auto; /* Enable horizontal scrolling for large tables */
 }
 
-.table-header {
-    background-color: rgb(175, 175, 255);
+.datalink .datacontainer .wrapper .product-table {
+    background-color: aqua;
+    width: 110vh;
 }
 
-th, td {
-    border: 1px solid;
-    padding: 10px;
+.datalink .datacontainer .wrapper .product-table .product-table-head {
+    background-color: bisque;
+    text-align: left;
 }
 
-/* Responsive styles for tablets and smartphones */
-@media (max-width: 768px) {
-    .header-wrapper {
-        margin-left: 0;
-        justify-content: center;
-        padding: 15px;
-    }
-
-    .product-table {
-        margin-top: 30px;
-    }
-
-    th, td {
-        padding: 8px;
-    }
+.datalink .datacontainer .termcond {
+    background-color: violet;
+    max-width: 100%;
 }
 
-/* Responsive styles for smartphones */
-@media (max-width: 480px) {
-    .wrapper {
-        padding: 10px;
-    }
-
-    .header-wrapper {
-        flex-direction: column;
-        margin-left: 0;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .product-table {
-        margin-top: 20px;
-    }
-
-    th, td {
-        padding: 6px;
-        font-size: 14px;
-    }
+.datalink .datacontainer .termcond .termcell {
+    width: 100%;
+    column-width: 100vh;
 }
 
-.download-button{
-    margin-top: 10px;
+.datalink .datacontainer .termcond .termcell .col {
+    float: left;
+    margin-right: 0%;
+}
+
+.download-button {
     background-color: rgba(0, 0, 255, 0.856);
     color: white;
     border: none;
     padding: 7px 20px;
     cursor: pointer;
     border-radius: 5px;
-    
-    
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1024px) {
+    .datalink .datalink-header {
+        margin-left: 20rem; /* Adjust left margin for smaller screens */
+    }
+
+    .datalink .todata .todata-recive {
+        margin-left: 30vh; /* Reduce left margin on smaller screens */
+    }
+
+    .datalink .datacontainer .wrapper .product-table {
+        width: 100%; /* Ensure table fits within screen width */
+    }
+}
+
+@media (max-width: 768px) {
+    .datalink .datalink-header {
+        margin-left: 10rem; /* Further reduce left margin for tablets */
+    }
+
+    .datalink .todata .todata-recive {
+        margin-left: 20vh; /* Further reduce left margin on tablets */
+    }
+
+    .datalink .datacontainer .wrapper .product-table {
+        font-size: 0.9rem; /* Slightly smaller text for better fit */
+    }
+}
+
+@media (max-width: 480px) {
+    .datalink .datalink-header {
+        margin-left: 5rem; /* Center header for small screens */
+    }
+
+    .datalink .todata .todata-recive {
+        margin-left: 10vh; /* Adjust left margin for small screens */
+    }
+
+    .datalink .datacontainer .wrapper .product-table {
+        font-size: 0.8rem; /* Smaller text for better fit */
+    }
+
+    .download-button {
+        padding: 10px; /* Slightly larger padding for touch devices */
+        width: 100%; /* Ensure button is full-width */
+    }
 }

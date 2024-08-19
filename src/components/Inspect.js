@@ -7,6 +7,7 @@ const Inspect = () => {
     const [display,setDisplay] = useState([]);
     const [database, setDatabase] = useState([]);
     const [val, setVal] = useState([]);
+    const [count, setCount]= useState(0);
     
 
 
@@ -63,9 +64,30 @@ const Inspect = () => {
         alert("Data Not Deleted")
       }
     }
+
+    
+
   return (
     <div>
-      <h1><strong>All Data</strong></h1>
+      <h1><strong>All Data</strong></h1><br/>
+      <h3><strong>select template Style</strong></h3>
+      <select onChange={(e)=>{
+                  const c = database?.find((x)=>x.id === e.target.value);
+                  console.log(c);
+                  setVal(c);
+                  setCount(1);
+                }}
+                defaultValue="default"
+                >
+                  
+                  {
+                    database.map((ele)=>
+                    {
+                      return<option key={ele.id} value={ele.id}>{ele.Template}</option>
+                    })
+                  }
+                  <option value="default" >Choose an Option</option>
+      </select>
       {
         display.map(data =>(
             <div className='box' key={data.id}>
@@ -74,26 +96,22 @@ const Inspect = () => {
                 <p><strong>Customer Name: </strong>{data.customer}</p>
                 <p><strong>Total:</strong> ₹{data.total}</p>
                 <button className='delete-btn' onClick={()=>deletData(data.id)}>Delete</button>
-                <button onClick={()=>{navigate('/details',{state:{data,val}})}} className='view-btn'>View</button>
-                <select onChange={(e)=>{
-                  const c = database?.find((x)=>x.id === e.target.value);
-                  console.log(c);
-                  setVal(c);
-                }}>
-                  <option>Choose an Option</option>
-                  {
-                    database.map((ele)=>
+                <button onClick={()=>{  
+                  
+                    if(count !=0 && val != undefined)
                     {
-                      return<option key={ele.id} value={ele.id}>{ele.id}</option>
-                    })
-                  }
-                </select>
+                      navigate('/details',{state:{data,val}})
+                    }
+                    else{
+                      alert('Template not selected')
+                    }
+                  }} className='view-btn'>View</button>
+                
                 
             </div>
         ))
       }
-     <img src={val.Image}></img> 
-     <p> {val.Rules}</p> 
+     
     </div>
   )
 }

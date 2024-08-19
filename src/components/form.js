@@ -227,7 +227,9 @@ const Form = ({refer}) => {
         </div> 
 
       </div>
-      <div className='table-container'>
+      {product ? 
+      <>
+              <div className='table-container'>
       <table className="styled-table">
       <thead>
           <tr>
@@ -276,7 +278,7 @@ const Form = ({refer}) => {
                                     </td> */}
                                     <td>
                                       <button className='delete-button'  onClick={()=>deletedata(index)}>Delete</button>
-                                      <button className='update-button' onClick={()=>updatedata(index)}>Update</button>
+                                      {/* <button className='update-button' onClick={()=>updatedata(index)}>Update</button> */}
                                     </td>
                                     
 
@@ -304,6 +306,9 @@ const Form = ({refer}) => {
       <button className='save' onClick={tosave}>Save</button>
       <button className='display-data' onClick={todisplay}>All Data Display</button>
       <button className='display-data' onClick={totemplate}>All Templates</button>
+
+      </> : undefined}
+      
     </>
   )
 }
