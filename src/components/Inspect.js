@@ -111,7 +111,9 @@ const Inspect = () => {
             </div>
         ))
       }
-     
+     <div>
+      <button onClick={()=> navigate('/filldetails')}>Add Quote</button>
+     </div>
     </div>
   )
 }

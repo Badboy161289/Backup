@@ -11,6 +11,10 @@
     margin: auto;
 }
 
+.datalink .container-footer {
+    margin: auto;
+}
+
 .datalink .todata {
     margin-top: 2vh;
     background-color: green;
@@ -69,10 +73,27 @@
     background-color: bisque;
     text-align: left;
 }
+.datalink .datacontainer .wrapper .product-table .total{
+    
+    text-align: right;
+    padding-bottom: 1em;
+    
+}
+
+
+.datalink .datacontainer .wrapper .product-table .totalcolumn{
+    
+    text-align: left;
+    padding-bottom: 1em;
+    font-weight: bold;
+    
+}
+
 
 .datalink .datacontainer .termcond {
     background-color: violet;
     max-width: 100%;
+    
 }
 
 .datalink .datacontainer .termcond .termcell {

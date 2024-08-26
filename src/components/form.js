@@ -1,316 +1,254 @@
 import React, { useEffect, useState } from 'react';
 import './form.css';
 import { db } from '../firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import PDFComponent from './PDFComponent';
 
-
-
-const Form = ({refer}) => {
-    // const [dataitem,setDataItem] = useState(
-    //     {
-    //         Item : '', Quntity: '' , Price : ''
-    //     }
-    // );
-    // let name, value;
-    // const data  = (e) =>
-    // {
-    //     name = e.target.name;
-    //     value = e.target.value;
-
-    //     setDataItem({...dataitem,[name]:value});
-    // }
-    // console.log(dataitem)
-    const [Item, setItem] = useState();
-    const [Quntity,setQuntity] = useState(1);
-    const [Price, setPrice] = useState();
+const Form = () => {
+    const [Item, setItem] = useState('');
+    const [Quntity, setQuntity] = useState(1);
+    const [Price, setPrice] = useState(0);
+    const [hsn, setHsn] = useState('');
+    const [tax, setTax] = useState(0);
     const [fetch, setFetch] = useState([]);
-    const [updateId, setUpdateId] = useState();
+    const [updateId, setUpdateId] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
-
-    const [customer, setCustomer] = useState();
-    const [product,setProduct] = useState([]);
-
-    const [index, setIndex] = useState();
-    const [bolin, setBolin] = useState(false);
-
-    //const dbref = collection(db, "ItemEntry");
-
-    // const addData = async () =>
-    // {
-    //   try{
-    //     const add_Data = await addDoc(dbref,{Item : Item, Quntity : Quntity, Price:Price });
-    //     if(add_Data)
-    //     {
-    //       alert("Item Added");
-    //       window.location.reload();
-    //     }
-    //   }catch(error)
-    //   {
-    //     alert("Error Occured");
-    //   }
-        
-    // }
-
-    // useEffect(()=>
-    // {
-    //   fetch_data();
-      
-    // },[])
-    
-    // const fetch_data = async () =>
-    // {
-    //    const get_data = await getDocs(dbref);
-       
-    //    let TotalPrice =0;
-    //    const data_snap = get_data.docs.map((doc)=>{
-    //     const data = doc.data();
-    //     const stringDataItemQuantity = data.Quntity; // replace with your field name
-    //     const numberData = Number(stringDataItemQuantity);
-    //     const stringDataItemPrice = data.Price; // replace with your field name
-    //     const numberData1 = Number(stringDataItemPrice);
-    //     TotalPrice += numberData * numberData1;
-
-    //     return { id: doc.id, ...data, numberField: numberData , numberField1: numberData1};
-    //    });
-
-       
-    //    console.log(data_snap);
-    //    setTotal(TotalPrice);
-    //    setFetch(data_snap);
-             
-       
+    const [proddiscount, setProdDiscount] = useState(0);
+    const [customer, setCustomer] = useState('');
+    const [customeradd, setCustomerAdd] = useState('');
+    const [quotation, setQuotation] = useState(15);
+    const [details, setDetails] = useState('');
+    const [tandc, setTandC] = useState('');
+    const [showList, setShowList] = useState(true);
+    const [product, setProduct] = useState([]);
+    const [totaldiscount , setTotalDiscount] = useState(0);
 
 
-    // }
-
-    //to find id in database for Updation function is needed
-    // const update_data = async (id) =>
-    // {
-    //     const matchfId = fetch.find((data) =>
-    //     {
-    //       return data.id === id
-    //     })
-    //     setItem(matchfId.Item)
-    //     setQuntity(matchfId.Quntity)
-    //     setPrice(matchfId.Price)
-    //     setUpdateId(matchfId.id)
-    // }
-
-    // const update = async() =>
-    // {
-    //   const updateraef = doc(dbref,updateId)
-    //   try {
-    //     await updateDoc(updateraef,{Item : Item, Quntity : Quntity, Price:Price })
-    //     alert("Item Data Updated")
-    //     window.location.reload()
-    //   } catch (error) {
-    //     alert("Item Data Not Updated")
-    //   }
-    // }
-
-    // const delete_data= async (id) =>{
-    //   const delete_ref = doc(dbref,id);
-    //   try {
-    //     await deleteDoc(delete_ref);
-    //     alert("Item Deleted");
-    //     window.location.reload();
-    //   } catch (error) {
-    //     alert("Item not deleted");
-    //   }
-    // } 
+    const [inputFields, setInputFields] = useState([
+        { productdetails: '', quntity: 1, unitprice: 1, hsn: '', tax: 3, discount: 0, total: 0 }
+    ]);
+    const [data, setData] = useState([]);
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const navigate = useNavigate();
 
-    const addItem =() =>
-    {
-      if (!customer || !Item || !Quntity || !Price) {
-        alert('All fields are required!');
-        return;
-      }
-    
-      
-        setProduct([...product,{'id':product.length, 'Item':Item ,'Quntity':Quntity,'Price':Price}]);
-      
-        const t = Quntity * Price;
-        setTotalPrice(totalPrice+t);
-        setItem('');
-        setPrice(0);
-        setQuntity(1);
-      
-     
-    }
+    const handleAddFields = () => {
+        setInputFields([...inputFields, { productdetails: '', quntity: 1, unitprice: 1, hsn: '', tax: 3, discount: 0, total: 0 }]);
+        setShowList(true);
+    };
 
-    const deletedata =(i) =>
-    {
-      console.log(i)
-      let total = [...product]
-      total.splice(i,1)
-      setProduct(total)
-    }
+    const handleChangeInput = (index, event) => {
+        const { name, value } = event.target;
+        const updatedFields = [...inputFields];
+        updatedFields[index] = {
+            ...updatedFields[index],
+            [name]: value
+        };
 
-    const updatedata = (i) =>
-    {
-      let{Item,Quntity,Price} = product[i];
+        const matchedItem = data.find(item => item.name.toLowerCase() === value.toLowerCase());
+        if (matchedItem) {
+            updatedFields[index] = {
+                ...updatedFields[index],
+                productdetails: matchedItem.name,
+                unitprice: matchedItem.price,
+                hsn: matchedItem.hsn,
+                tax: matchedItem.tax,
+            };
+        }
 
-      setItem(Item)
-      setQuntity(Quntity)
-      setPrice(Price)
-      setBolin(true)
-      setIndex(i)
-    }
+        setInputFields(updatedFields);
+    };
 
-    const updateinfo = (i) =>
-    {
-      let upttotal=[...product]
-      upttotal.splice(index,1,{'id':index,Item,Quntity,Price})
-      setProduct(upttotal)
-      setBolin(false)
-      setItem('');
-      setPrice(0);
-      setQuntity(1);
-    }
-   
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log("Input", inputFields);
+    };
+
+    const addcustomerdetails = () => {
+        if (!customer || !customeradd) {
+            alert('All fields are required!');
+            return;
+        }
+        setIsDisabled(true);
+        console.log(customer, customeradd, quotation, details, tandc);
+    };
+
+    const fetchData = async () => {
+        const querySnapshot = await getDocs(collection(db, 'prod'));
+        const dataList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setData(dataList);
+        console.log(dataList);
+    };
+
+    const addfields = (index, item) => {
+        const updatedFields = [...inputFields];
+        updatedFields[index] = {
+            ...updatedFields[index],
+            productdetails: item.name,
+            unitprice: item.price,
+            hsn: item.hsn,
+        };
+        setInputFields(updatedFields);
+        setShowList(false);
+    };
+
+    // useEffect(() => {
+    //     const subtotal = inputFields.reduce((acc, curElm) => acc + (curElm.unitprice-curElm.discount) * curElm.quntity + (((curElm.unitprice - curElm.discount) * curElm.quntity * curElm.tax) / 100) , 0);
+    //     const subdis = inputFields.reduce((acc,curElm)=> acc+curElm.discount)
+
+    //     setTotalDiscount(subdis)
+    //     setTotalPrice(subtotal);
+        
+    // }, [inputFields]);
 
     useEffect(() => {
-      // Calculate total price when items change
-      const total = product.reduce((acc, curElm) => acc + curElm.Price * curElm.Quntity, 0);
-      setTotalPrice(total);
-      
-    }, [product]);
+        // Calculate subtotal and total discount
+        const { subtotal, discountTotal } = inputFields.reduce(
+          (acc, curElm) => {
+            const discountedPrice = curElm.unitprice - curElm.discount;
+            const itemTotal = discountedPrice * curElm.quntity;
+            const taxAmount = (itemTotal * curElm.tax) / 100;
+            const totalItemPrice = itemTotal + taxAmount;
+    
+            return {
+              subtotal: acc.subtotal + totalItemPrice,
+              discountTotal: acc.discountTotal + (curElm.discount * curElm.quntity),
+            };
+          },
+          { subtotal: 0, discountTotal: 0 }
+        );
+    
+        setTotalPrice(subtotal);
+        setTotalDiscount(discountTotal);
+      }, [inputFields]);
 
-    const tosave = async() =>
-    {
-      console.log(product);
-      console.log(customer);
-      console.log(totalPrice);
-      if (!customer && !product) {
-        alert('All fields are required!');
-        return;
-      }
-      const data = await addDoc(collection(db,'quotation'),
-      {
-        customer : customer,
-        product : product,
-        total : totalPrice,
-        date: Timestamp.fromDate(new Date())
-      }
-    );
-    console.log(data);
-    navigate('/display');  
-  }
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-  const todisplay = () =>
-  {
-    navigate('/display');
-  }
-  const totemplate = () =>
-    {
-      navigate('/template');
-    }
+    const tosave = async () => {
+        console.log(product);
+        console.log(customer);
+        console.log(totalPrice);
+        if (!customer || !inputFields.length || !customeradd) {
+            alert('All fields are required!');
+            return;
+        }
+        const data = await addDoc(collection(db, 'quotation'), {
+            customer: customer,
+            customeradd: customeradd,
+            Quotevalid: quotation,
+            anydetail: details,
+            tandc: tandc,
+            product: inputFields,
+            totaldiscount: totaldiscount,
+            total: totalPrice,
+            date: Timestamp.fromDate(new Date())
+        });
+        console.log(data);
+        navigate('/');
+    };
 
-  return (
-    <>
-      <div className='form'>
-        <div className='container'>
-                <input type='text' name='Customername' placeholder='Enter Customer Name' value={customer} onChange={(e) => setCustomer(e.target.value)} required></input>
-                <input type='text' name='Item' placeholder='Enter Item Name' value={Item}  onChange={(e) => setItem(e.target.value)}  required></input>
-                <input type='number' name='Quntity' placeholder='Enter Item Quntity' value={Quntity}  onChange={(e) => setQuntity(e.target.value) } required></input>
-                <input type='number' name='Price' placeholder='Enter Item Price' value={Price}  onChange={(e) => setPrice(e.target.value)} required></input>
-                {/* <button onClick={()=>addData()}>Submit</button>
-                <button onClick={()=>update()}>Update</button> */}
-                <button onClick={!bolin ? addItem :updateinfo}>{!bolin ?'Submit':'Update Item'}</button>
-                
-                
-            
-        
-        </div> 
+    return (
+        <>
+            <div className='form'>
+                <h2>Customer Details</h2><br />
+                <div className='container'>
+                    <label>Customer Name:</label>
+                    <input type='text' disabled={isDisabled} name='Customername' placeholder='Enter Customer Name' value={customer} onChange={(e) => setCustomer(e.target.value)} required></input>
 
-      </div>
-      {product ? 
-      <>
-              <div className='table-container'>
-      <table className="styled-table">
-      <thead>
-          <tr>
-            <th>Sr.No</th>
-            <th>Item</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total Price</th>
-            <th>Actions</th>
-          </tr>
-      </thead>
-                    {
-                      product.map((curElm,index)=>
-                      {
-                        return(
+                    <label>Customer Address:</label>
+                    <input type='text' disabled={isDisabled} name='Customeraddress' placeholder='Enter Customer Address' value={customeradd} onChange={(e) => setCustomerAdd(e.target.value)} required></input>
 
-                          // <div>
-                          //   <p>----------------------------------------</p>
-                          //   <p>Item:{curElm.Item}</p><br/><br/>
-                          //   <p>Quntity:{curElm.Quntity}</p><br/><br/>
-                          //   <p>Price:{curElm.Price}</p><br/><br/>
-                          //   <div>
-                          //     <button onClick={()=> update_data(curElm.id)}>Update</button>
-                          //     <p>-------------------------------------</p>
-                          //   </div>
-                          // </div>
+                    <label>Quotation Validity Period:</label>
+                    <input type='number' disabled={isDisabled} name='QuoteValid' placeholder='Enter Quotation Validity Period:' value={quotation} onChange={(e) => setQuotation(e.target.value)} required ></input>
 
-                          < >
-                                
-                                
-                                  <tbody>
-                                  <tr key={index}>
-                                  <td>{index+1}</td>
-                                    <td>{curElm.Item}</td>
-                                    <td>{curElm.Quntity}</td>
-                                    <td>₹{curElm.Price}</td>
-                                    <td>₹{curElm.Price * curElm.Quntity}</td>
-                                    
-                                    {/* <td>
-                                      <button className="update-button" onClick={() => update_data(curElm.id)}>
-                                        Update
-                                      </button>
-                                      <button className="delete-button" onClick={() => delete_data(curElm.id)}>
-                                        Delete
-                                      </button>
-                                    </td> */}
+                    <label>Additional details (if any):</label>
+                    <input type='text' disabled={isDisabled} name='details' placeholder='Enter Details' value={details} onChange={(e) => setDetails(e.target.value)} required ></input>
+
+                    <label>Terms and Conditions:</label>
+                    <input type='text' disabled={isDisabled} name='tandc' placeholder='Terms and Condition' value={tandc} onChange={(e) => setTandC(e.target.value)}></input>
+                    <button onClick={addcustomerdetails} disabled={isDisabled}>Save and Continue</button>
+                </div>
+            </div>
+            <br />
+            <div className='form'>
+                <h2>Add Product</h2><br />
+                <div className='table-container'>
+                    <button onClick={handleSubmit}>Submit</button>
+                    <button onClick={handleAddFields}>Add Product</button>
+                    <table className="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Sr.No</th>
+                                <th>Product Details</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>HSN/SAC</th>
+                                <th>Tax</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {inputFields.map((inputField, index) => (
+                                <tr key={index}>
+                                    <td>{index + 1}</td>
                                     <td>
-                                      <button className='delete-button'  onClick={()=>deletedata(index)}>Delete</button>
-                                      {/* <button className='update-button' onClick={()=>updatedata(index)}>Update</button> */}
+                                        <input
+                                            list={`productList${index}`}
+                                            type='text'
+                                            name='productdetails'
+                                            onChange={(e) => handleChangeInput(index, e)}
+                                            value={inputField.productdetails}
+                                        />
+                                        <datalist id={`productList${index}`}>
+                                            {inputField.productdetails === '' ? null :
+                                                data.filter(item => item.name.toLowerCase().includes(inputField.productdetails.toLowerCase()))
+                                                    .map(filteredItem => (
+                                                        <option
+                                                            key={filteredItem.id}
+                                                            value={filteredItem.name}
+                                                            onClick={() => addfields(index, filteredItem)}
+                                                        />
+                                                    ))
+                                            }
+                                        </datalist>
                                     </td>
-                                    
+                                    <td><input type='number' name='quntity' value={inputField.quntity} onChange={e => handleChangeInput(index, e)}></input></td>
+                                    <td><input type='number' name='unitprice' value={inputField.unitprice} disabled></input></td>
+                                    <td><input type='number' name='hsn' value={inputField.hsn} disabled></input></td>
+                                    <td><input type='number' name='tax' value={inputField.tax} disabled></input></td>
+                                    <td><input type='number' name='discount' value={inputField.discount} onChange={e => handleChangeInput(index, e)}></input></td>
+                                    <td>{inputField.total = (inputField.unitprice-inputField.discount) * inputField.quntity + (((inputField.unitprice -inputField.discount) * inputField.quntity * inputField.tax) / 100) }</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            <div className='align-data'>
+                <p><strong>Grand Total:{totalPrice}₹</strong></p>
+                <p><strong>Total Discount:{totaldiscount}₹</strong></p>
+            </div>
+            
+            </div>
+            
+            
+            <button className='save' onClick={tosave}> Save</button>
+            <PDFComponent 
+                customer={customer} 
+                customeradd={customeradd} 
+                quotation={quotation} 
+                details={details} 
+                tandc={tandc} 
+                inputFields={inputFields} 
+                totalPrice={totalPrice} 
+                totaldiscount={totaldiscount} 
+            />
+           
+        </>
+    );
+};
 
-                                  
-                                  </tr>
-                                  
-                                  
-                                  </tbody>
-                                
-                                  
-                          </>
-                        );
-                      })
-                    
-                    }
-              
-              
-        
-        </table>
-        {
-                 <strong><p className='total-set'>Total:{totalPrice}</p></strong>
-               }
-        
-      </div>
-      <button className='save' onClick={tosave}>Save</button>
-      <button className='display-data' onClick={todisplay}>All Data Display</button>
-      <button className='display-data' onClick={totemplate}>All Templates</button>
-
-      </> : undefined}
-      
-    </>
-  )
-}
-
-export default Form
+export default Form;
